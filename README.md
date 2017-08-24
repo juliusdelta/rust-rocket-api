@@ -23,13 +23,13 @@ As I haven't written a proper seeding script yet you can seed the database manua
 In terminal:
 
 ```
-psql movie-api
+$ psql movie-api
 
-INSERT INTO movies (id, title, director, rating)
+$ INSERT INTO movies (id, title, director, rating)
 VALUES (1, 'The Matrix', 'The Wachowskis', 'R'),
 (2, '2001: A Space Odyssey', 'Stanley Kubrick', 'PG-13');
 
-\q #+to quit psql
+$ \q #+to quit psql
 ```
 
 That should give you some temp seed data until I can get a seeding script run.
