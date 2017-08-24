@@ -3,59 +3,42 @@
 
 extern crate rocket;
 extern crate serde_json;
+extern crate dotenv;
 #[macro_use] extern crate rocket_contrib;
 #[macro_use] extern crate serde_derive;
+#[macro_use] extern crate diesel;
+#[macro_use] extern crate diesel_codegen;
 
 use rocket_contrib::{Json, Value};
-use rocket::State;
-use std::collections::HashMap;
-use std::sync::Mutex;
+use diesel::prelude::*;
+use diesel::pg::PgConnection;
+use dotenv::dotenv;
+use std::env;
+use models::*;
 
-type ID = usize;
+pub mod schema;
+pub mod models;
+pub mod movie;
 
-type MovieMap = Mutex<HashMap<ID, String>>;
+pub fn establish_connection() -> PgConnection {
+    dotenv().ok();
 
-#[derive(Serialize, Deserialize)]
-struct Movie {
-    id: Option<ID>,
-    title: String
-}
-
-#[post("/<id>", format = "application/json", data = "<movie>")]
-fn new(id: ID, movie: Json<Movie>, map: State<MovieMap>) -> Json<Value> {
-    let mut hashmap = map.lock().expect("map lock.");
-    if hashmap.contains_key(&id) {
-        Json(json!({
-            "status": "error",
-            "reason": "ID exists. Try put."
-        }))
-    } else {
-        hashmap.insert(id, movie.0.title);
-        Json(json!({"status": "ok"}))
-    }
-}
-
-#[put("/<id>", format = "application/json", data = "<movie>")]
-fn update(id: ID, movie: Json<Movie>, map: State<MovieMap>) -> Option<Json<Value>> {
-    let mut hashmap = map.lock().unwrap();
-    if hashmap.contains_key(&id) {
-        hashmap.insert(id, movie.0.title);
-        Some(Json(json!({"status": "ok"})))
-    } else {
-        None
-    }
+    let database_url = env::var("DATABASE_URL")
+        .expect("DATABASE URL must be set");
+    PgConnection::establish(&database_url)
+        .expect(&format!("Error connecting to {}.", database_url))
 }
 
 #[get("/<id>", format = "application/json")]
-fn get(id: ID, map: State<MovieMap>) -> Option<Json<Movie>> {
-    let hashmap = map.lock().unwrap();
-    hashmap.get(&id).map(|titles| {
-        Json(Movie {
-            id: Some(id),
-            title: titles.clone()
-        })
-    })
+fn get(id: i32) -> Result<Json<Movie>, diesel::result::Error> {
+    let conn: PgConnection = establish_connection();
+    let movie = movie::get_movie(&conn, id)?;
+    Ok(Json(movie))
 }
+
+// #[post("/<id>", format = "application/json", data = "<movie>")]
+
+// #[put("/<id>", format = "application/json", data = "<movie>")]
 
 #[error(404)]
 fn not_found() -> Json<Value> {
@@ -67,9 +50,8 @@ fn not_found() -> Json<Value> {
 
 fn rocket() -> rocket::Rocket {
     rocket::ignite()
-        .mount("/movie", routes![new, update, get])
+        .mount("/movie", routes![get])
         .catch(errors![not_found])
-        .manage(Mutex::new(HashMap::<ID, String>::new()))
 }
 
 fn main() {
