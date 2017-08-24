@@ -2,12 +2,10 @@ extern crate serde;
 extern crate serde_json;
 
 use diesel::result::Error;
-use diesel;
 use diesel::pg::PgConnection;
 use models::*;
 use diesel::prelude::*;
 use schema::movies;
-use self::serde::ser;
 
 pub fn get_movie(conn: &PgConnection, id: i32) -> Result<Movie, Error> {
     movies::table

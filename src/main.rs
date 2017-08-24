@@ -2,7 +2,6 @@
 #![plugin(rocket_codegen)]
 
 extern crate rocket;
-#[macro_use]
 extern crate serde_json;
 extern crate dotenv;
 #[macro_use] extern crate rocket_contrib;
@@ -11,15 +10,11 @@ extern crate dotenv;
 #[macro_use] extern crate diesel_codegen;
 
 use rocket_contrib::{Json, Value};
-use rocket::State;
 use diesel::prelude::*;
-#[macro_use]
 use diesel::pg::PgConnection;
 use dotenv::dotenv;
 use std::env;
 use models::*;
-use movie::{get_movie};
-use rocket::error::Error;
 
 pub mod schema;
 pub mod models;
@@ -35,13 +30,10 @@ pub fn establish_connection() -> PgConnection {
 }
 
 #[get("/<id>", format = "application/json")]
-fn get<'a>(id: i32) -> Result<Json<Movie>, &'static str> {
+fn get(id: i32) -> Result<Json<Movie>, diesel::result::Error> {
     let conn: PgConnection = establish_connection();
-    let movie: Result<Movie, diesel::result::Error> = movie::get_movie(&conn, id);
-    match movie {
-        Ok(value) => Json(value),
-        Err(e) => println!("{}", e),
-    }
+    let movie = movie::get_movie(&conn, id)?;
+    Ok(Json(movie))
 }
 
 // #[post("/<id>", format = "application/json", data = "<movie>")]
