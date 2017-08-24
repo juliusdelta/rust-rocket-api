@@ -36,6 +36,13 @@ fn get(id: i32) -> Result<Json<Movie>, diesel::result::Error> {
     Ok(Json(movie))
 }
 
+#[get("/", format = "application/json")]
+fn get_all() -> Result<Json<Vec<Movie>>, diesel::result::Error> {
+    let conn: PgConnection = establish_connection();
+    let movies = movie::get_movies(conn)?;
+    Ok(Json(movies))
+}
+
 // #[post("/<id>", format = "application/json", data = "<movie>")]
 
 // #[put("/<id>", format = "application/json", data = "<movie>")]
@@ -50,7 +57,7 @@ fn not_found() -> Json<Value> {
 
 fn rocket() -> rocket::Rocket {
     rocket::ignite()
-        .mount("/movie", routes![get])
+        .mount("/", routes![get_all, get])
         .catch(errors![not_found])
 }
 

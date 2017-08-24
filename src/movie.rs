@@ -13,10 +13,10 @@ pub fn get_movie(conn: &PgConnection, id: i32) -> Result<Movie, Error> {
         .first::<Movie>(conn)
 }
 
-// pub fn get_movies(conn: PgConnection) -> Result<Vec<Movie>, Error> {
-//     movies::table
-//         .load::<Movie>(conn)
-// }
+pub fn get_movies(conn: PgConnection) -> Result<Vec<Movie>, Error> {
+    movies::table
+        .load::<Movie>(&conn)
+}
 
 // pub fn create_movie(conn: &PgConnection, movie: <Movie>) -> Result<Movie, Error> {
 //     diesel::insert(&movie)
