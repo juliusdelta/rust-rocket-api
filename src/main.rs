@@ -29,7 +29,7 @@ pub fn establish_connection() -> PgConnection {
         .expect(&format!("Error connecting to {}.", database_url))
 }
 
-#[get("/<id>", format = "application/json")]
+#[get("/movie/<id>", format = "application/json")]
 fn get(id: i32) -> Result<Json<Movie>, diesel::result::Error> {
     let conn: PgConnection = establish_connection();
     let movie = movie::get_movie(&conn, id)?;
