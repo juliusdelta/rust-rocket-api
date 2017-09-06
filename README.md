@@ -24,6 +24,6 @@
 
 ## Code Direction
 
-This is just a simple project I anticipate making a robust guide for. There is a significant amount of things to be done including finishing out the `POST` and `PUT` requests, adding database relationships for things like directors and actors for movies, and then ultimately a frontend of some kind. Currently I haven't written out a property roadmap, however, if there's something you'd like to add, suggest, or fix, feel free to open an issue or a PR and I will respond. 
+This is just a simple project I anticipate making a robust guide for. There is a significant amount of things to be done including finishing out the `POST` and `PUT` requests, adding database relationships for things like directors and actors for movies, and then ultimately a frontend of some kind. Currently I haven't written out a proper roadmap, however, if there's something you'd like to add, suggest, or fix, feel free to open an issue or a PR and I will respond. 
 
 I do plan to document this thoroughly as this is my first Rust project, and a lot of learning resources assume prior knowledge of C++ or C to be productive quickly. I'm sure there are a good amount of exceptions to that, but that's been my personal experience thus far. 
