@@ -10,7 +10,7 @@
 1. Ensure you're currently running Rust Nightly. [Here are the installation instructions](https://doc.rust-lang.org/1.13.0/book/nightly-rust.html).
 2. Clone the repo down.
 3. Set up `.env` file with local postgres credentials. See `.example.env` for a quick example. (It's already in the .gitignore for this repo)
-   - I have a small guide on finding your local Postgres info on [my blog](http://localhost:4000/2017/08/31/find-local-postgres-info).
+   - I have a small guide on finding your local Postgres info on [my blog](http://www.juliusdelta.co/2017/08/31/find-local-postgres-info/).
    - If you've just installed postgres locally, chances are you don't have a password. See `.example.env` for reference.
 4. Install the [Diesel](http://diesel.rs/) CLI with `cargo install diesel_cli`.
 5. Run `diesel setup` which will setup the database if it's hasn't already been.
