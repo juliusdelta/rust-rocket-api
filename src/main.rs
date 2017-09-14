@@ -9,7 +9,7 @@ extern crate dotenv;
 #[macro_use] extern crate diesel_codegen;
 
 use rocket_contrib::{Json, Value};
-use rocket::response::status::{Created};
+use rocket::response::status::{Created, NoContent};
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
 use dotenv::dotenv;
@@ -51,6 +51,13 @@ fn new(movie: Json<Movie>) -> Result<Created<Json<Movie>>, diesel::result::Error
     Ok(Created(url, Some(Json(x))))
 }
 
+#[delete("/movie/<id>")]
+fn movie_delete(id: i32) -> Result<NoContent, diesel::result::Error> {
+    let conn = establish_connection();
+    movie::delete_movie(&conn, id)?;
+    Ok(NoContent)
+}
+
 // #[put("/<id>", format = "application/json", data = "<movie>")]
 
 #[error(404)]
@@ -63,7 +70,7 @@ fn not_found() -> Json<Value> {
 
 fn rocket() -> rocket::Rocket {
     rocket::ignite()
-        .mount("/", routes![get_all, get, new])
+        .mount("/", routes![get_all, get, new, movie_delete])
         .catch(errors![not_found])
 }
 
