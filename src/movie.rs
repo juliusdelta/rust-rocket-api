@@ -1,6 +1,4 @@
-extern crate serde;
-extern crate serde_json;
-
+use diesel;
 use diesel::result::Error;
 use diesel::pg::PgConnection;
 use models::*;
@@ -18,11 +16,19 @@ pub fn get_movies(conn: PgConnection) -> Result<Vec<Movie>, Error> {
         .load::<Movie>(&conn)
 }
 
-// pub fn create_movie(conn: &PgConnection, movie: <Movie>) -> Result<Movie, Error> {
-//     diesel::insert(&movie)
-//         .into(movies::table)
-//         .get_result(conn)
-// }
+pub fn create_movie(conn: &PgConnection, movie: Movie) -> Result<Movie, Error> {
+    use::schema::movies;
+
+    let new_movie = NewMovie {
+        title: &movie.title,
+        director: &movie.director,
+        rating: &movie.rating
+    };
+
+    diesel::insert(&new_movie)
+        .into(movies::table)
+        .get_result(conn)
+}
 
 // pub fn delete_movie(conn: &PgConnection, id: i32) -> Result<usize, Error> {
 //     diesel::delete(movies::table.find(id))
