@@ -35,8 +35,8 @@ pub fn delete_movie(conn: &PgConnection, id: i32) -> Result<usize, Error> {
         .execute(conn)
 }
 
-// pub fn update_movie(conn: &PgConnection, id: i32, updated_move: Json<Movie>) -> Result<Movie, Error> {
-//     diesel::update(movies::table.find(id))
-//         .set(&updated_movie)
-//         .get_result::<Movie>(conn)
-// }
+pub fn update_movie(conn: &PgConnection, id: i32, updated_movie: Movie) -> Result<Movie, Error> {
+    diesel::update(movies::table.find(id))
+        .set(&updated_movie)
+        .get_result::<Movie>(conn)
+}

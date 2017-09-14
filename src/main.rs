@@ -58,7 +58,12 @@ fn movie_delete(id: i32) -> Result<NoContent, diesel::result::Error> {
     Ok(NoContent)
 }
 
-// #[put("/<id>", format = "application/json", data = "<movie>")]
+#[patch("/movie/<id>", format = "application/json", data = "<movie>")]
+fn movie_edit(id: i32, movie: Json<Movie>) -> Result<Json<Movie>, diesel::result::Error> {
+    let conn = establish_connection();
+    let movie = movie::update_movie(&conn, id, movie.0)?;
+    Ok(Json(movie))
+}
 
 #[error(404)]
 fn not_found() -> Json<Value> {
@@ -70,7 +75,7 @@ fn not_found() -> Json<Value> {
 
 fn rocket() -> rocket::Rocket {
     rocket::ignite()
-        .mount("/", routes![get_all, get, new, movie_delete])
+        .mount("/", routes![get_all, get, new, movie_delete, movie_edit])
         .catch(errors![not_found])
 }
 
