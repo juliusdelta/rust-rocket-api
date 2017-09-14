@@ -43,7 +43,14 @@ fn get_all() -> Result<Json<Vec<Movie>>, diesel::result::Error> {
     Ok(Json(movies))
 }
 
-// #[post("/<id>", format = "application/json", data = "<movie>")]
+// #[post("/", format = "application/json", data = "<movie>")]
+// fn new(movie: Json<Movie>) -> Result<Movie, diesel::result::Error> {
+//     let deserialized_movie = serde_json::from_str(&movie).unwrap();
+//     let conn = establish_connection();
+
+//     movie::create_movie(&conn, deserialized_movie)?;
+//     Ok(Json(movie))
+// }
 
 // #[put("/<id>", format = "application/json", data = "<movie>")]
 
