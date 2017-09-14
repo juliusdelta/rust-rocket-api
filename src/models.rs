@@ -1,7 +1,7 @@
 use schema::movies;
 
 #[derive(Queryable)]
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct Movie {
     pub id: i32,
     pub title: String,
@@ -9,7 +9,7 @@ pub struct Movie {
     pub rating: String,
 }
 
-#[derive(Insertable)]
+#[derive(Insertable, Deserialize)]
 #[table_name="movies"]
 pub struct NewMovie< 'a > {
     pub title: &'a str,

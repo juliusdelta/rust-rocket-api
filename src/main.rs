@@ -2,7 +2,6 @@
 #![plugin(rocket_codegen)]
 
 extern crate rocket;
-extern crate serde_json;
 extern crate dotenv;
 #[macro_use] extern crate rocket_contrib;
 #[macro_use] extern crate serde_derive;
@@ -10,6 +9,7 @@ extern crate dotenv;
 #[macro_use] extern crate diesel_codegen;
 
 use rocket_contrib::{Json, Value};
+use rocket::response::status::{Created};
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
 use dotenv::dotenv;
@@ -43,14 +43,13 @@ fn get_all() -> Result<Json<Vec<Movie>>, diesel::result::Error> {
     Ok(Json(movies))
 }
 
-// #[post("/", format = "application/json", data = "<movie>")]
-// fn new(movie: Json<Movie>) -> Result<Movie, diesel::result::Error> {
-//     let deserialized_movie = serde_json::from_str(&movie).unwrap();
-//     let conn = establish_connection();
-
-//     movie::create_movie(&conn, deserialized_movie)?;
-//     Ok(Json(movie))
-// }
+#[post("/", format = "application/json", data = "<movie>")]
+fn new(movie: Json<Movie>) -> Result<Created<Json<Movie>>, diesel::result::Error> {
+    let conn = establish_connection();
+    let x = movie::create_movie(&conn, movie.0)?;
+    let url = format!("/movie/{}", x.id);
+    Ok(Created(url, Some(Json(x))))
+}
 
 // #[put("/<id>", format = "application/json", data = "<movie>")]
 
@@ -64,7 +63,7 @@ fn not_found() -> Json<Value> {
 
 fn rocket() -> rocket::Rocket {
     rocket::ignite()
-        .mount("/", routes![get_all, get])
+        .mount("/", routes![get_all, get, new])
         .catch(errors![not_found])
 }
 
