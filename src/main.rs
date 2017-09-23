@@ -15,10 +15,10 @@ use diesel::pg::PgConnection;
 use dotenv::dotenv;
 use std::env;
 use models::*;
+use schema::movies;
 
 pub mod schema;
 pub mod models;
-pub mod movie;
 
 pub fn establish_connection() -> PgConnection {
     dotenv().ok();
@@ -32,36 +32,52 @@ pub fn establish_connection() -> PgConnection {
 #[get("/movie/<id>", format = "application/json")]
 fn get(id: i32) -> Result<Json<Movie>, diesel::result::Error> {
     let conn: PgConnection = establish_connection();
-    let movie = movie::get_movie(&conn, id)?;
+    let movie = movies::table
+        .find(id)
+        .first::<Movie>(&conn)?;
     Ok(Json(movie))
 }
 
 #[get("/", format = "application/json")]
 fn get_all() -> Result<Json<Vec<Movie>>, diesel::result::Error> {
     let conn: PgConnection = establish_connection();
-    let movies = movie::get_movies(conn)?;
+    let movies = movies::table
+        .load::<Movie>(&conn)?;
     Ok(Json(movies))
 }
 
 #[post("/", format = "application/json", data = "<movie>")]
 fn new(movie: Json<Movie>) -> Result<Created<Json<Movie>>, diesel::result::Error> {
+    use::schema::movies;
     let conn = establish_connection();
-    let x = movie::create_movie(&conn, movie.0)?;
-    let url = format!("/movie/{}", x.id);
-    Ok(Created(url, Some(Json(x))))
+    let new_movie = NewMovie {
+        title: &movie.0.title,
+        director: &movie.0.director,
+        rating: &movie.0.rating
+    };
+
+    let movie: Movie = diesel::insert(&new_movie)
+        .into(movies::table)
+        .get_result(&conn)?;
+
+    let url = format!("/movie/{}", movie.id);
+    Ok(Created(url, Some(Json(movie))))
 }
 
 #[delete("/movie/<id>")]
 fn movie_delete(id: i32) -> Result<NoContent, diesel::result::Error> {
     let conn = establish_connection();
-    movie::delete_movie(&conn, id)?;
+    diesel::delete(movies::table.find(id))
+        .execute(&conn)?;
     Ok(NoContent)
 }
 
 #[patch("/movie/<id>", format = "application/json", data = "<movie>")]
 fn movie_edit(id: i32, movie: Json<Movie>) -> Result<Json<Movie>, diesel::result::Error> {
     let conn = establish_connection();
-    let movie = movie::update_movie(&conn, id, movie.0)?;
+    let movie = diesel::update(movies::table.find(id))
+        .set(&movie.0)
+        .get_result::<Movie>(&conn)?;
     Ok(Json(movie))
 }
 
