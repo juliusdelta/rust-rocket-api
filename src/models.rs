@@ -11,8 +11,8 @@ pub struct Movie {
 
 #[derive(Insertable, Deserialize, AsChangeset)]
 #[table_name="movies"]
-pub struct NewMovie< 'a > {
-    pub title: &'a str,
-    pub director: &'a str,
-    pub rating: &'a str,
+pub struct NewMovie {
+    pub title: String,
+    pub director: String,
+    pub rating: String,
 }
