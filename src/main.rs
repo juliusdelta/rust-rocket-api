@@ -47,13 +47,12 @@ fn get_all() -> Result<Json<Vec<Movie>>, diesel::result::Error> {
 }
 
 #[post("/", format = "application/json", data = "<movie>")]
-fn new(movie: Json<Movie>) -> Result<Created<Json<Movie>>, diesel::result::Error> {
-    use::schema::movies;
+fn new(movie: Json<NewMovie>) -> Result<Created<Json<Movie>>, diesel::result::Error> {
     let conn = establish_connection();
     let new_movie = NewMovie {
-        title: &movie.0.title,
-        director: &movie.0.director,
-        rating: &movie.0.rating
+        title: movie.0.title,
+        director: movie.0.director,
+        rating: movie.0.rating
     };
 
     let movie: Movie = diesel::insert(&new_movie)
